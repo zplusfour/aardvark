@@ -228,31 +228,42 @@ namespace Aardvark {
           ExprTypes type = vincludes<string>(assignments, opvalue)
             ? ExprTypes::Assign
             : ExprTypes::Binary;
-        }
+
+          Expression* expr = new Expression(type, op);
+          expr->left = left;
+          expr->op = op;
+          expr->right = pBinary(isCall(pAll()), newPrec); // Now parse the right node and right right node
+          // Something like that
+
+          return pBinary(expr, prec); // Parse right node again if its smaller binding       }
       }
+
+      return left;
     }
 
-    Expression* pAll() {
+    Expresxsion* pAll() {
       // TODO: Complete this function
-    };
 
+      if (isType("Delimiter", "(")) { // Parses basic (2 + 2) or Anything surrounded by parenthesis
+        advance();
+        Expression* expr = pExpression();
+        skipOver("Delimiter", ")");
+        return expr;
+      }
+    
+    
     Expression* pExpression() {
       // this automagically helps us with formatting the ast correctly
-      return isCall(pBinary(isCall(pAll()), 0));
     };
-
+  
     Expression* parse() {
-      asat = new Expression(ExprTypes::Scope, Token("_TOP_", true)); // Setting up the top scope since adk doesn't have a main func
       curTok = tokens[0];
-
       while (!curTok.isNull() && !isEOF()) {
         Expression* expr = pExpression();
         ast->block.push_back(expr);
 
         if (!curTok.isNull() && !isEOF()) skipOver("Delimiter", ";");
+          return ast;
       }
-
-      return ast;
-    }
+    };
   };
-};

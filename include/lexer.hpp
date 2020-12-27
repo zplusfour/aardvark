@@ -169,6 +169,7 @@ namespace Aardvark {
         if (isWhitespace(curChar))
           advance();
 
+				// I like this if statement -ZDev1
         if (curChar == '\n') {
 					++line;
 					column = 0;
