@@ -235,25 +235,26 @@ namespace Aardvark {
           expr->right = pBinary(isCall(pAll()), newPrec); // Now parse the right node and right right node
           // Something like that
 
-          return pBinary(expr, prec); // Parse right node again if its smaller binding       }
+          return pBinary(expr, prec); // Parse right node again if its smaller binding 
+        }
       }
 
       return left;
     }
 
-    Expresxsion* pAll() {
-      // TODO: Complete this function
-
+    Expression* pAll() {
+      // TODO: Complete this functio
       if (isType("Delimiter", "(")) { // Parses basic (2 + 2) or Anything surrounded by parenthesis
         advance();
         Expression* expr = pExpression();
         skipOver("Delimiter", ")");
         return expr;
       }
-    
+    }
     
     Expression* pExpression() {
       // this automagically helps us with formatting the ast correctly
+      return isCall(pBinary(isCall(pAll()), 0));
     };
   
     Expression* parse() {
@@ -265,5 +266,6 @@ namespace Aardvark {
         if (!curTok.isNull() && !isEOF()) skipOver("Delimiter", ";");
           return ast;
       }
-    };
+    }
   };
+} // namespace Aardvark
