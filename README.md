@@ -1,3 +1,3 @@
 # The Aardvark Programming Language
 
-description later
+![Aardvark](images/aardvark.png)
