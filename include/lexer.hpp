@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include "errors.hpp"
+#include "filesystem.hpp"
 
 /*
 This is a very very simple lexer don't judge. (I didn't judge)
@@ -42,6 +43,12 @@ namespace Aardvark {
 		Token(string type, char val): type(type) {
 			value = new string(1, val);
 		};
+    Token(std::string type, int val): type(type) {
+      value = new int(val);
+    }
+    Token(std::string type, double val): type(type) {
+      value = new double(val);
+    }
 
 		Token(string val, bool isIdentifier = true) {
 			type = isIdentifier ? "Identifier" : "String";
@@ -59,7 +66,9 @@ namespace Aardvark {
 			return *(string*)value;
 		}
 
-		int getInt() {
+		int getInt(bool cast = false) {
+			if (cast)
+				return std::stoi(getString());
 			return *(int*)value;
 		}
 
@@ -156,8 +165,25 @@ namespace Aardvark {
 			);
 		}
 
-		bool isOperator(char c) { return false; };
-
+		// Kind ugly but whatever
+    int isOperator(char c) {
+      if (
+        (c == '=' && peek() == '=') // '==' operator
+        || (c == '!' && peek() == '=') // '!=' operator
+        || (c == '&' && peek() == '&') // '&&' operator
+        || (c == '|' && peek() == '|') // '||' operator
+      ) return 2;
+      else if (
+        (c == '+')
+        || (c == '-')
+        || (c == '*')
+        || (c == '/')
+        || (c == '%')
+        || (c == '=')
+      ) return 1;
+      else return 0;
+		}
+    
 		vector<Token> tokenize() {
 			if (input.size() < 1) return {};
 
@@ -183,6 +209,25 @@ namespace Aardvark {
 					tokens.push_back(tok);
 
 					advance();
+        }
+
+				if (isOperator(curChar) > 0) {
+          int amt = isOperator(curChar);
+          std::string op = std::string(1, curChar);
+          int col = column;
+          int ln = line;
+
+          for (int i = 0; i < amt - 1; i++) {
+            op += advance();
+          }
+
+          advance();
+
+          Token tok = Token("Operator", op.c_str());
+          tok.column = col;
+          tok.line = ln;
+
+          tokens.push_back(tok);
         }
 
 				if (isQuote(curChar)) {

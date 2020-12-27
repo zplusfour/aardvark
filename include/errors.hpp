@@ -22,4 +22,14 @@ namespace Aardvark {
 		public:
 		SyntaxError(string msg): Error(msg, "SyntaxError") {};
 	};
-};
+
+	class TypeError : public Error {
+		public:
+		TypeError(string msg): Error(msg, "TypeError") {};
+	};
+
+	class UndeclaredError : public Error {
+    public:
+		UndeclaredError(string msg): Error(msg, "UndeclaredError") {};
+  };
+} // namespace Aardvark

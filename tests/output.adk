@@ -1,0 +1,8 @@
+x = "Nice this works";
+x = "But anyways I got to go and ill do more tomorrow";
+y = "Hopefully we can do more tomorrow and if you are on earlier like at 8 or 9 your time that would be cool.";
+z = "Share the repo with your Aardvark folks. Anyways cya!";
+
+output(x);
+output(y);
+output(z);

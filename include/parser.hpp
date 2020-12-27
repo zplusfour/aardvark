@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "lexer.hpp"
 
 namespace Aardvark {
@@ -76,6 +77,12 @@ namespace Aardvark {
     Token identifier;
     Expression* dotOp; // dot operation for like properties and stuff
 
+    bool isArray;
+    Expression* then;
+    Expression* els;
+    Expression* condition;
+    Expression* scope;
+
     Expression(Token value): type(ExprTypes::None), value(value) {};
     Expression(ExprTypes type, Token value): type(type), value(value) {};
   };
@@ -153,7 +160,7 @@ namespace Aardvark {
       advance();
     }
 
-		bool nonCallabes(Expression* expression) {
+		bool nonCallables(Expression* expression) {
       return (
         expression->type != ExprTypes::Function
         && expression->type != ExprTypes::If
@@ -203,11 +210,18 @@ namespace Aardvark {
 		}
 
     Expression* isCall(Expression* expression) {
-      return isType("Delimiter", "(", peek()) && nonCallables(expression) ? pCall(expression);
+      return (isType("Delimiter", "(", peek()) && nonCallables(expression)) ? pCall(expression) : expression;
     }
 
     Expression* pCall(Expression* expr) {
       // TODO: Parse function calls here
+      advance();
+      Token identifier = expr->value;
+
+      Expression* call = new Expression(ExprTypes::FunctionCall, identifier);
+      call->args = pDelimiters("(", ")", ",");
+
+      return call;
     }
 
     Expression* pBinary(Expression* left, int prec) {
@@ -242,6 +256,20 @@ namespace Aardvark {
       return left;
     }
 
+    Expression* pIdentifier(Expression* expr) {
+      expr->type = ExprTypes::Identifier;
+			expr->dotOp = nullptr;
+
+			if (!isType("Delimiter", "(", peek()))
+				advance();
+
+			if (!pDotOp(expr)) {
+        // TODO
+			}
+
+			return expr;
+    }
+
     Expression* pAll() {
       // TODO: Complete this functio
       if (isType("Delimiter", "(")) { // Parses basic (2 + 2) or Anything surrounded by parenthesis
@@ -250,6 +278,27 @@ namespace Aardvark {
         skipOver("Delimiter", ")");
         return expr;
       }
+
+      Expression* token = new Expression(curTok);
+
+      if (isType("Int")) {
+        token->type = ExprTypes::Int;
+				advance();
+
+				return token;
+			} else if (isType("Float")) {
+        token->type = ExprTypes::Float;
+				advance();
+
+				return token;
+			} else if (isType("String")) {
+        token->type = ExprTypes::String;
+				advance();
+
+				return token;
+			} else if (isType("Identifier")) {
+				return pIdentifier(token);
+			}
     }
     
     Expression* pExpression() {
@@ -258,14 +307,17 @@ namespace Aardvark {
     };
   
     Expression* parse() {
+      ast = new Expression(ExprTypes::Scope, Token("_TOP_", true));
       curTok = tokens[0];
+
       while (!curTok.isNull() && !isEOF()) {
         Expression* expr = pExpression();
         ast->block.push_back(expr);
 
         if (!curTok.isNull() && !isEOF()) skipOver("Delimiter", ";");
-          return ast;
       }
+
+      return ast;
     }
   };
 } // namespace Aardvark
