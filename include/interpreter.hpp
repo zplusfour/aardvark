@@ -326,7 +326,7 @@ namespace Aardvark {
       Scope = scope;
     }
 
-    std::string getIdentifier(Expression* exp) {
+    std::string getIdentifier(Expression* exp) {\
       switch (exp->type) {
         case ExprTypes::Identifier:
           return exp->value.getString();

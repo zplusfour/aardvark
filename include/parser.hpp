@@ -136,7 +136,7 @@ namespace Aardvark {
     }
 
     void skipIgnore() {
-      if (!isIgnore(curTok)) throw SyntaxError("Unexpected token '" + curTok.type + "'");
+      // if (!isIgnore(curTok)) throw SyntaxError("Unexpected token '" + curTok.type + "'");
       while (isIgnore(curTok) && !curTok.isNull() && !isEOF()) advance();
     }
 
@@ -228,6 +228,7 @@ namespace Aardvark {
 
       Expression* call = new Expression(ExprTypes::FunctionCall, identifier);
       call->args = pDelimiters("(", ")", ",");
+      call->dotOp = nullptr;
 
       return call;
     }
@@ -308,7 +309,10 @@ namespace Aardvark {
 				return pIdentifier(token);
 			}
 
-      if (isIgnore(curTok)) skipIgnore();
+      if (isIgnore(curTok)) {
+        skipIgnore();
+        return token;
+      }
     }
     
     Expression* pExpression() {
@@ -319,6 +323,8 @@ namespace Aardvark {
     Expression* parse() {
       ast = new Expression(ExprTypes::Scope, Token("_TOP_", true));
       curTok = tokens[0];
+
+      if (isIgnore(curTok)) skipIgnore();
 
       while (!curTok.isNull() && !isEOF()) {
         Expression* expr = pExpression();
