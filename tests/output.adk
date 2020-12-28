@@ -1,1 +1,5 @@
-output('hi')
+bool = True
+
+if bool == True {
+  output("kewl")
+}
