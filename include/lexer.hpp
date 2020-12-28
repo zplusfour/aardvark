@@ -213,6 +213,18 @@ namespace Aardvark {
 			return false;
 		}
 
+		char fixEscapes(char c) {
+			if (c == '\\') {
+				switch(advance()) {
+					case 'n': return '\n';
+					case 't': return '\t';
+
+					default: return c;
+				}
+			}
+			return c;
+		}
+
 		vector<Token> tokenize() {
 			if (input.size() < 1) return {};
 
@@ -271,7 +283,7 @@ namespace Aardvark {
 					advance();
 
 					while (curChar != '\0' && curChar != quote) {
-						val += curChar;
+						val += fixEscapes(curChar);
 						advance();
 					}
 

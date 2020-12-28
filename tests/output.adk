@@ -1,4 +1,3 @@
-
-
-output("Imagine making an interpreter in Python and not C++")
-output("Test")
+x = "lulz"
+y = "yasir\n\nTest"
+output(x + ' ' + y)
