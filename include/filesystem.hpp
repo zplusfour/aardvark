@@ -38,18 +38,9 @@ namespace Aardvark {
     
     bool isFirst = true;
     while (std::getline(File, line)) {
-      if (
-        !(
-          line.empty()
-          || (
-            isOnlyWhitespace(line)
-          )
-        )
-      ) {
-        if (!isFirst) data += "\n";
-        else isFirst = false;
-        data += line;
-      }
+      if (!isFirst) data += "\n";
+      else isFirst = false;
+      data += line;
     }
 
     File.close();

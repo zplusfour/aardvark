@@ -497,6 +497,7 @@ namespace Aardvark {
       Lexer lexer = Lexer(input);
       Parser parser = Parser(lexer.tokenize());
       ast = parser.parse();
+      // for (auto token : parser.tokens) token.debugPrint();
       return Evaluate(ast, Scope);
     }
 

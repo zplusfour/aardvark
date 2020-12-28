@@ -183,7 +183,36 @@ namespace Aardvark {
       ) return 1;
       else return 0;
 		}
+
+		// Just realized there is an issue with comments will do it later
+		bool isCommentBegin(char c) {
+			return c == '/' && (
+				!isIdentifier(peek()) &&
+				!isQuote(peek())
+			);
+		}
+
+		bool isCommentEnd(char c) {
+			return c == '\\';
+		}
     
+		bool checkLinebreak() {
+			// I like this if statement -ZDev1
+			if (curChar == '\n') {
+				Token tok = Token("Linebreak", '\n');
+				tok.setPosition(column, line);
+				tokens.push_back(tok);
+
+				++line;
+				column = 0;
+
+				advance();
+				return true;
+			}
+
+			return false;
+		}
+
 		vector<Token> tokenize() {
 			if (input.size() < 1) return {};
 
@@ -195,13 +224,15 @@ namespace Aardvark {
         if (isWhitespace(curChar))
           advance();
 
-				// I like this if statement -ZDev1
-        if (curChar == '\n') {
-					++line;
-					column = 0;
+				// if (isCommentBegin(curChar)) {
+				// 	while (!isCommentEnd(curChar)) {
+				// 		if (!checkLinebreak()) advance();
+				// 	}
 
-          advance();
-        }
+				// 	std::cout << curChar << std::endl;
+				// }
+
+        checkLinebreak();
 
         if (isDelimiter(curChar)) {
           Token tok = Token("Delimiter", curChar);

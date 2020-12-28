@@ -1,6 +1,7 @@
 # Add variables like this
 # or with an equals sign (I think)
 FLAGS := -std=c++17 -I./include
+FILES := src/main.cpp include/lexer.hpp include/parser.hpp include/interpreter.hpp
 
 # Run the program and compile it if it needs to be
 # (make / make run)
@@ -9,7 +10,7 @@ run: adk.o
 
 # Compile the program (make build)
 build:
-adk.o: src/main.cpp include/lexer.hpp
+adk.o: $(FILES)
 	g++ $(FLAGS) -c src/main.cpp -o adk.o
 	g++ $(FLAGS) adk.o -o adk.exe
 

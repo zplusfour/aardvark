@@ -129,7 +129,15 @@ namespace Aardvark {
     }
 
     bool isIgnore(Token tok) {
-      return tok.type == "Delimiter" && tok.getString() == ";";
+      return (
+        (tok.type == "Delimiter" && tok.getString() == ";") ||
+        (tok.type == "Linebreak" && tok.getString() == "\n")
+      );
+    }
+
+    void skipIgnore() {
+      if (!isIgnore(curTok)) throw SyntaxError("Unexpected token '" + curTok.type + "'");
+      while (isIgnore(curTok) && !curTok.isNull() && !isEOF()) advance();
     }
 
 		void skipOverVal(string val, Token tok) {
@@ -299,6 +307,8 @@ namespace Aardvark {
 			} else if (isType("Identifier")) {
 				return pIdentifier(token);
 			}
+
+      if (isIgnore(curTok)) skipIgnore();
     }
     
     Expression* pExpression() {
@@ -314,7 +324,7 @@ namespace Aardvark {
         Expression* expr = pExpression();
         ast->block.push_back(expr);
 
-        if (!curTok.isNull() && !isEOF()) skipOver("Delimiter", ";");
+        if (!curTok.isNull() && !isEOF()) skipIgnore();
       }
 
       return ast;
