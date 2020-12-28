@@ -318,7 +318,7 @@ namespace Aardvark {
     AdkScope* Scope;
 
     Interpreter() { Scope = new AdkScope(); }
-    Interpreter(Expression* ast): ast(ast) { // What is this?
+    Interpreter(Expression* ast): ast(ast) { // What is this
       Scope = new AdkScope();
     }
 

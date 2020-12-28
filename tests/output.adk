@@ -1,10 +1,16 @@
-funct fact(x) {
+funct fact(x) { // Functions, if statments, returns, and recursion works \\
   if x == 1 {
     return 1
   }
 
   return x * fact(x - 1)
 }
-// test \\
-x = num(input("Enter a string to convert it to a number: "))
-output(x + 10);
+
+x = num(input("Enter a string to convert it to a number: ")) // Getting input and casting it to a number and variables work \\
+output(x + 10, fact(5)) // Outputing multiple arguments and text works. Also basic arithmetic works. \\
+
+y = True
+
+if y == True { // Booleans work so far \\
+  output("Nicely done!")
+} // oh yea I changed the comments and it works \\

@@ -182,6 +182,7 @@ namespace Aardvark {
       bool isFirst = true;
 
       skipOverVal(start, curTok);
+      if (isIgnore(curTok)) skipIgnore();
 
       while (!isEOF()) {
         if (isType("Delimiter", end)) {
@@ -195,7 +196,7 @@ namespace Aardvark {
         }
 
         Expression* val = pExpression();
-        values.push_back(val);
+        values.push_back(val);\
       }
       skipOverVal(end, curTok);
 
@@ -313,6 +314,7 @@ namespace Aardvark {
 
       ifStmt->condition = expr;
       ifStmt->els = nullptr;
+
 
       Expression* then = new Expression(ExprTypes::Scope, Token("Then", true));
       then->block = pDelimiters("{", "}", ";\n");

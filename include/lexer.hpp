@@ -119,6 +119,8 @@ namespace Aardvark {
 			if (index + amt >= input.length())
 				return '\0'; // return nullbyte if index > the length of the input
 
+			if (input[index + amt] == '\r') return peek(amt + 1);
+
 			return input[index + amt];
 		}
 
@@ -248,8 +250,9 @@ namespace Aardvark {
 			while (curChar != '\0') {
 				const int lastIndex = index;
 
-        if (isWhitespace(curChar))
-          advance();
+        if (isWhitespace(curChar)) {
+					while (isWhitespace(curChar)) advance();
+				}
 
 				if (isDirective(curChar)) {
 					advance();
@@ -258,6 +261,8 @@ namespace Aardvark {
 					
 				}
 
+        checkLinebreak();
+
 				if (isComment(curChar)) {
 					while (!isCommentEnd(curChar)) {
 						if (!checkLinebreak()) advance();
@@ -265,8 +270,6 @@ namespace Aardvark {
 
 					advance(2);
 				}
-
-        checkLinebreak();
 
         if (isDelimiter(curChar)) {
           Token tok = Token("Delimiter", curChar);
