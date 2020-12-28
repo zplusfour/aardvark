@@ -3,6 +3,7 @@
 #include "../include/interpreter.hpp"
 #include "../include/colors.hpp"
 #include <sstream>
+#include <typeinfo>
 using namespace Aardvark;
 
 AdkScope* globals = new AdkScope();
