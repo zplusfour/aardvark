@@ -509,6 +509,8 @@ namespace Aardvark {
           return new AdkValue(exp->value.getString());
         case ExprTypes::Int:
           return new AdkValue(exp->value.getInt(true));
+        case ExprTypes::Bool:
+          return new AdkValue(exp->value.getString() == "True" ? true : false);
 
         case ExprTypes::If:
           return iIf(exp, scope);

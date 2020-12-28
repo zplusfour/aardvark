@@ -23,6 +23,7 @@ namespace Aardvark {
     Int,
     Float,
     String,
+    Bool,
     Variable,
     Identifier,
     Assign,
@@ -187,6 +188,8 @@ namespace Aardvark {
           break;
         } else if (isFirst) {
           isFirst = false;
+        } else if (separator == ";\n") {
+          skipIgnore();
         } else {
           skipOverVal(separator, curTok);
         }
@@ -279,6 +282,51 @@ namespace Aardvark {
 			return expr;
     }
 
+    Expression* pFunction() {
+      skipOverVal("funct", curTok); // Skip over keyword
+      Token identifier = curTok;
+      advance(); // Skip over Identifier
+
+      Expression* function = new Expression(ExprTypes::Function, identifier);
+      function->args = pDelimiters("(", ")", ",");
+      function->scope = new Expression(ExprTypes::Scope, identifier);
+      function->scope->block = pDelimiters("{", "}", ";\n");
+
+      return function;
+    };
+
+    Expression* pReturn() {
+      skipOverVal("return", curTok); // Skip over keyword
+
+      Expression* returnVal = pExpression();
+      Expression* returnExpr = new Expression(ExprTypes::Return, curTok);
+      returnExpr->scope = returnVal;
+
+      return returnExpr;
+    };
+
+    Expression* pIf() {
+      skipOverVal("if", curTok); // Skip over keyword
+
+      Expression* ifStmt = new Expression(ExprTypes::If, Token("If", true));
+      Expression* expr = pExpression();
+
+      ifStmt->condition = expr;
+      ifStmt->els = nullptr;
+
+      Expression* then = new Expression(ExprTypes::Scope, Token("Then", true));
+      then->block = pDelimiters("{", "}", ";\n");
+
+      ifStmt->then = then;
+
+      return ifStmt;
+    }
+
+    Expression* pBoolean(Expression* token) {
+      advance();
+      return new Expression(ExprTypes::Bool, token->value);
+    }
+
     Expression* pAll() {
       // TODO: Complete this functio
       if (isType("Delimiter", "(")) { // Parses basic (2 + 2) or Anything surrounded by parenthesis
@@ -289,6 +337,18 @@ namespace Aardvark {
       }
 
       Expression* token = new Expression(curTok);
+
+      if (isType("Keyword", "funct"))
+        return pFunction();
+
+      if (isType("Keyword", "return"))
+        return pReturn();
+
+      if (isType("Keyword", "if"))
+        return pIf();
+
+      if (isType("Keyword", "True") || isType("Keyword", "False"))
+        return pBoolean(token);
 
       if (isType("Int")) {
         token->type = ExprTypes::Int;

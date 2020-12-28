@@ -17,7 +17,9 @@ namespace Aardvark {
 		{ "True", "Keyword" },
 		{ "False", "Keyword" },
 		{ "if", "Keyword" },
-		{ "while", "Keyword" }
+		{ "while", "Keyword" },
+		{ "funct", "Keyword" },
+		{ "return", "Keyword" }
 	};
 	class Token {
 		public:
@@ -140,7 +142,8 @@ namespace Aardvark {
         c == ')' ||
         c == '{' ||
         c == '}' ||
-        c == ';'
+        c == ';' ||
+				c == ','
       );
     }
 
@@ -184,16 +187,8 @@ namespace Aardvark {
       else return 0;
 		}
 
-		// Just realized there is an issue with comments will do it later
-		bool isCommentBegin(char c) {
-			return c == '/' && (
-				!isIdentifier(peek()) &&
-				!isQuote(peek())
-			);
-		}
-
-		bool isCommentEnd(char c) {
-			return c == '\\';
+		bool isDigit(char c) {
+			return '0' <= c && '9' >= c;
 		}
     
 		bool checkLinebreak() {
@@ -218,11 +213,31 @@ namespace Aardvark {
 				switch(advance()) {
 					case 'n': return '\n';
 					case 't': return '\t';
+					case 'r': return '\r';
 
-					default: return c;
+					default: return curChar;
 				}
 			}
 			return c;
+		}
+
+		bool isNumber(char c) {
+      return (
+        (c == '-' && isDigit(peek()))
+        || isDigit(c)
+      );
+    }
+
+		bool isDirective(char c) {
+			return c == '#';
+		}
+
+		bool isComment(char c) {
+			return c == '/' && peek() == '/';
+		}
+
+		bool isCommentEnd(char c) {
+			return c == '\\' && peek() == '\\';
 		}
 
 		vector<Token> tokenize() {
@@ -236,13 +251,20 @@ namespace Aardvark {
         if (isWhitespace(curChar))
           advance();
 
-				// if (isCommentBegin(curChar)) {
-				// 	while (!isCommentEnd(curChar)) {
-				// 		if (!checkLinebreak()) advance();
-				// 	}
+				if (isDirective(curChar)) {
+					advance();
 
-				// 	std::cout << curChar << std::endl;
-				// }
+					std::string directive = "";
+					
+				}
+
+				if (isComment(curChar)) {
+					while (!isCommentEnd(curChar)) {
+						if (!checkLinebreak()) advance();
+					}
+
+					advance(2);
+				}
 
         checkLinebreak();
 
@@ -252,6 +274,37 @@ namespace Aardvark {
 					tokens.push_back(tok);
 
 					advance();
+        }
+
+				if (isNumber(curChar)) {
+          std::string type = "Int";
+          int col = column;
+          int ln = line;
+
+          std::string val = "";
+
+          if (curChar == '-') {
+            val += curChar;
+            advance();
+          }
+
+          while (isNumber(curChar)) {
+            val += curChar;
+            advance();
+
+            if (curChar == '.') {
+              type = "Float";
+              val += ".";
+
+              advance();
+            }
+          }
+
+          Token tok = Token(type, val.c_str());
+          tok.column = col;
+          tok.line = ln;
+
+          tokens.push_back(tok);
         }
 
 				if (isOperator(curChar) > 0) {
