@@ -1,3 +1,5 @@
-#include packages/std
+funct greet(x) {
+  return x
+}
 
-output(greet("Hi"))
+output(greet("yessir"))
