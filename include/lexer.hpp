@@ -255,10 +255,21 @@ namespace Aardvark {
 				}
 
 				if (isDirective(curChar)) {
-					advance();
+					int col = column;
+					int ln = line;
 
-					std::string directive = "";
+					advance();
+					string directive = "";
 					
+					while (curChar != '\n' && curChar != '\0') {
+						directive += curChar;
+						advance();
+					}
+
+					Token tok = Token("Directive", directive);
+					tok.setPosition(col, ln);
+
+					tokens.push_back(tok);
 				}
 
         checkLinebreak();

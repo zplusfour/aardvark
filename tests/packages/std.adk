@@ -1,0 +1,3 @@
+funct greet(x) {
+  return x;
+}

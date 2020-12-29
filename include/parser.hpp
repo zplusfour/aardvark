@@ -58,6 +58,40 @@ namespace Aardvark {
     return ExprStrings[((int)type)];
   }
 
+  vector<string> splitStr(string str, char split) {
+    vector<string> arr;
+
+    string main = "";
+
+    for (auto c : str) {
+      if (c == split) {
+        arr.push_back(main);
+        main = "";
+      } else {
+        main += c;
+      }
+    }
+
+    if (main.length() > 0)
+      arr.push_back(main);
+
+    return arr;
+  }
+
+  string joinVector(vector<string> arr, string join) {
+    string main = "";
+
+    bool isFirst = true;
+    for (auto str : arr) {
+      if (isFirst) isFirst = false;
+      else main += join;
+
+      main += str;
+    }
+
+    return main;
+  }
+
   template<typename T>
   bool vincludes(vector<T> arr, T value) {
     return find(arr.begin(), arr.end(), value) != arr.end();
@@ -97,7 +131,10 @@ namespace Aardvark {
 
     Expression* ast;
 
+    char** argv;
+
     Parser(vector<Token> tokens): tokens(tokens) {};
+    Parser(vector<Token> tokens, char** argv): tokens(tokens), argv(argv) {};
 
     Token advance(int amt = 1) {
       if (pos + amt >= tokens.size()) return curTok = Token();
@@ -329,8 +366,52 @@ namespace Aardvark {
       return new Expression(ExprTypes::Bool, token->value);
     }
 
+    Expression* pInclude(vector<string> args) {
+      string filename = args[1] + ".adk";
+      
+      string mainfile = argv[1];
+      vector<string> folders = splitStr(mainfile, '/');
+
+      string folder = "";
+
+      if (folders.size() > 1) {
+        folders.pop_back();
+        folder = joinVector(folders, "/") + "/";
+      }
+
+      string path = fileExists("./packages/" + filename) ? "./packages/" + filename : folder + filename;
+      string fileText;
+
+      if (!fileExists(path)) throw FileError("Not Found", filename);
+
+      fileText = readFile(path);
+
+      Lexer lexer = Lexer(fileText);
+      vector<Token> tokens = lexer.tokenize();
+
+      Parser parser = Parser(tokens);
+      Expression* fileast = parser.parse();
+
+      ast->block.insert(ast->block.end(), fileast->block.begin(), fileast->block.end());
+      advance();
+
+      return new Expression(ExprTypes::None, Token());
+    }
+
+    Expression* pDirective(Expression* token) {
+      string fulldirective = token->value.getString();
+      vector<string> args = splitStr(fulldirective, ' ');
+
+      if (args[0] == "include") {
+        return pInclude(args);
+      }
+
+      advance();
+      return token;
+    }
+
     Expression* pAll() {
-      // TODO: Complete this functio
+      // TODO: Complete this function
       if (isType("Delimiter", "(")) { // Parses basic (2 + 2) or Anything surrounded by parenthesis
         advance();
         Expression* expr = pExpression();
@@ -348,6 +429,9 @@ namespace Aardvark {
 
       if (isType("Keyword", "if"))
         return pIf();
+
+      if (isType("Directive"))
+        return pDirective(token);
 
       if (isType("Keyword", "True") || isType("Keyword", "False"))
         return pBoolean(token);
@@ -390,7 +474,8 @@ namespace Aardvark {
 
       while (!curTok.isNull() && !isEOF()) {
         Expression* expr = pExpression();
-        ast->block.push_back(expr);
+        if (expr->type != ExprTypes::None)
+          ast->block.push_back(expr);
 
         if (!curTok.isNull() && !isEOF()) skipIgnore();
       }

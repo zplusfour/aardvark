@@ -2,7 +2,7 @@
 #include <sstream>
 #include <string>
 #include <fstream>
-
+#include <iostream>
 namespace Aardvark {
   bool isOnlyWhitespace(std::string x) {
     bool is = false;
@@ -46,5 +46,19 @@ namespace Aardvark {
     File.close();
 
     return data;
+  }
+
+  void appendFile(std::string file, std::string data) {
+    std::string filedata = readFile(file);
+    
+    filedata += data;
+
+    writeFile(file, filedata);
+  }
+
+  bool fileExists(std::string file) {
+    std::ifstream File(file);
+
+    return File.good();
   }
 }; // namespace Aardvark

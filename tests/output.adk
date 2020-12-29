@@ -1,5 +1,3 @@
-bool = True
+#include packages/std
 
-if bool == True {
-  output("kewl")
-}
+output(greet("Hi"))

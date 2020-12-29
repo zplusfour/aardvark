@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 
 // A little color namespace so we can easily add Colors

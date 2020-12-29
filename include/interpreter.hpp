@@ -493,9 +493,9 @@ namespace Aardvark {
       return Evaluate(ast, Scope);
     }
 
-    AdkValue* Interpret(std::string input) {
+    AdkValue* Interpret(std::string input, char** argv) {
       Lexer lexer = Lexer(input);
-      Parser parser = Parser(lexer.tokenize());
+      Parser parser = Parser(lexer.tokenize(), argv);
       ast = parser.parse();
       // for (auto token : parser.tokens) token.debugPrint();
       return Evaluate(ast, Scope);

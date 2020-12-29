@@ -91,12 +91,10 @@ int main(int argc, char** argv)
 	interpreter->SetGlobals(globals);
 
 	try {
-		interpreter->Interpret(fileData);
-	} catch(Error& e) {
+		interpreter->Interpret(fileData, argv);
+	} catch(exception& e) {
 		std::cerr
-			<< Colors::Red
-			<< e.type << ": " << e.what()
-			<< Colors::Reset
+			<< e.what()
 			<< std::endl;
 	}
 
