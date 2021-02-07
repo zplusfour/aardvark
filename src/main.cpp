@@ -4,6 +4,7 @@
 #include "../include/colors.hpp"
 #include <sstream>
 #include <typeinfo>
+#include <algorithm>
 using namespace Aardvark;
 
 AdkScope* globals = new AdkScope();
@@ -56,6 +57,16 @@ AdkValue* num(std::vector<AdkValue*> args) {
 	return new AdkValue(n);
 }
 
+AdkValue* lower(std::vector<AdkValue*> args) {
+	std::string s = args[0]->toString();
+
+	for (int i = 0; i < s.length(); i++){
+  	s[i] = tolower(s[i]);
+  }
+
+	return new AdkValue(s);
+}
+
 int main(int argc, char** argv)
 {
 	// Lexer lexer("output(\"Hello, World\")");
@@ -87,6 +98,8 @@ int main(int argc, char** argv)
 	globals->Set("input", new AdkFunction(interpreter, input));
 	globals->Set("str", new AdkFunction(interpreter, str));
 	globals->Set("num", new AdkFunction(interpreter, num));
+	globals->Set("lower", new AdkFunction(interpreter, lower));
+	globals->Set("upper", new AdkFunction(interpreter, upper));
 
 	interpreter->SetGlobals(globals);
 
