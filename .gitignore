@@ -1,2 +1,3 @@
-.vscode
-*.ps1
+.vscode/
+env.ps1
+images/
