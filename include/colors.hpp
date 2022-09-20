@@ -1,22 +1,27 @@
 #pragma once
+
+#include <cstdint>
 #include <iostream>
+#include <string>
+#include <string_view>
 
-// A little color namespace so we can easily add Colors
-// Don't know if there is a std lib one already though but oh well
+
 namespace Colors {
-	using namespace std;
-
-	static string Red = "\x1b[38;2;255;25;25m";
-	static string Green = "\x1b[38;2;25;255;25m";
-	static string Blue = "\x1b[38;2;25;25;255m";
-  static string White = "\x1b[38;2;255;255;255m";
-  static string Reset = "\x1b[0m";
-
-	string getColor(int r, int g, int b) {
-		string red = to_string(r);
-		string green = to_string(g);
-		string blue = to_string(b);
-
-		return "\x1b[38;2;" + red + ";" + green + ";" + blue + "m";
+	constexpr std::string getColor(const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue) noexcept {
+		return "\x1b[38;2;" + std::to_string(red) + ';' + std::to_string(green) + ';' + std::to_string(blue) + 'm';
 	};
+
+	static constexpr std::string_view Reset = "\u001b[0m";
+	static constexpr std::string_view Red = Colors::getColor(255, 0, 0);
+	static constexpr std::string_view Orange = Colors::getColor(255, 127, 0);
+	static constexpr std::string_view Yellow = Colors::getColor(255, 255, 0);
+	static constexpr std::string_view Lime = Colors::getColor(127, 255, 0);
+	static constexpr std::string_view Green = Colors::getColor(0, 255, 0);
+	static constexpr std::string_view Teal = Colors::getColor(0, 255, 127);
+	static constexpr std::string_view Cyan = Colors::getColor(0, 255, 255);
+	static constexpr std::string_view Azure = Colors::getColor(0, 127, 255);
+	static constexpr std::string_view Blue = Colors::getColor(0, 0, 255);
+	static constexpr std::string_view Purple = Colors::getColor(127, 0, 255);
+	static constexpr std::string_view Pink = Colors::getColor(255, 0, 255);
+	static constexpr std::string_view Magenta = Colors::getColor(255, 0, 127);
 };
