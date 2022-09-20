@@ -1,70 +1,45 @@
+#include <cctype>
+#include <cstddef>
 #include <iostream>
+#include <string>
 #include <vector>
-#include "../include/interpreter.hpp"
 #include "../include/colors.hpp"
-#include <sstream>
-#include <typeinfo>
-#include <algorithm>
-using namespace Aardvark;
+#include "../include/interpreter.hpp"
 
-AdkScope* globals = new AdkScope();
+Aardvark::AdkScope* globals = new Aardvark::AdkScope();
 
-AdkValue* print(std::vector<AdkValue*> args) {
-	std::string end = "\n";
-	std::string seperator = " ";
-
-	bool isFirst = true;
-	
-	for (auto arg : args) {
-		if (isFirst) isFirst = false;
-		else std::cout << seperator;
-
-		std::cout << arg->toString();
+Aardvark::AdkValue* print(const std::vector<Aardvark::AdkValue*>& args) {
+	const std::size_t argsSize = args.size();
+	if (argsSize) {
+		std::cout << args[0]->toString();
+		for (std::size_t i = 1; i < argsSize; ++i) {
+			std::cout << ' ' << args[i]->toString();
+		}
 	}
-
-	std::cout << end;
-
-	return new AdkValue();
+	std::cout << '\n';
+	return new Aardvark::AdkValue();
 };
 
-AdkValue* input(std::vector<AdkValue*> args) {
-
-	std::string i;
-	std::cout << args[0]->toString();
-	
-	std::getline(std::cin, i);
-
-	return new AdkValue(i);
+Aardvark::AdkValue* input(const std::vector<Aardvark::AdkValue*>& args) {
+	std::string input;
+	print(args);
+	std::getline(std::cin, input);
+	return new Aardvark::AdkValue(input);
 }
 
-AdkValue* str(std::vector<AdkValue*> args) {
-	std::string s = args[0]->toString();
-	std::stringstream ss;
-	ss << s;
-	std::string x;
-	ss >> x;
-
-	return new AdkValue(x);
+Aardvark::AdkValue* str(const std::vector<Aardvark::AdkValue*>& args) {
+	return new Aardvark::AdkValue(args[0]->toString());
 }
 
-AdkValue* num(std::vector<AdkValue*> args) {
-	std::string s = args[0]->toString();
-	std::stringstream toint(s);
-
-	int n = 0;
-	toint >> n;
-
-	return new AdkValue(n);
+Aardvark::AdkValue* num(const std::vector<Aardvark::AdkValue*>& args) {
+	return new Aardvark::AdkValue(std::stoi(args[0]->toString()));
 }
 
-AdkValue* lower(std::vector<AdkValue*> args) {
-	std::string s = args[0]->toString();
-
-	for (int i = 0; i < s.length(); i++){
-  	s[i] = tolower(s[i]);
-  }
-
-	return new AdkValue(s);
+Aardvark::AdkValue* lower(const std::vector<Aardvark::AdkValue*>& args) {
+	std::string result = args[0]->toString();
+	for (std::size_t i = 0; i < result.size(); ++i)
+  		result[i] = std::tolower(result[i]);
+	return new Aardvark::AdkValue(result);
 }
 
 int main(int argc, char** argv)
@@ -87,7 +62,7 @@ int main(int argc, char** argv)
   // }
 
 	if (argc < 2) {
-		std::cerr << "Aardvark: No file specified!" << std::endl;
+		std::cerr << "Aardvark: No file specified!\n";
 		return 1;
 	};
 
@@ -106,9 +81,7 @@ int main(int argc, char** argv)
 	try {
 		interpreter->Interpret(fileData, argv);
 	} catch(exception& e) {
-		std::cerr
-			<< e.what()
-			<< std::endl;
+		std::cerr << e.what() << '\n';
 	}
 
 	// std::cout << "Function Name: " << ast->block[0]->value.getString() << std::endl;

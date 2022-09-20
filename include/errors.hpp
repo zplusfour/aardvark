@@ -1,23 +1,26 @@
+#pragma once
+
 #include <exception>
 #include <string>
-#include "colors.hpp"
+#include "./colors.hpp"
+
 
 namespace Aardvark {
-	using namespace std;
 	class Error : public exception {
-		public:
-		string message;
-		string type;
+	public:
+		std::string message;
+		std::string type;
 
-		Error(string message, string type): message(message), type(type) {
+		Error(std::string_view message, std::string_view type): message(message), type(type) {
 			format();
-		};
-		Error(string message): message(message) {
+		}
+
+		Error(std::string_view message): message(message) {
 			type = "Error";
 			format();
-		};
+		}
 
-		void format() {
+		virtual void format() {
 			message = Colors::Red + type + ": " + message + Colors::Reset;
 		}
 
@@ -26,33 +29,34 @@ namespace Aardvark {
 		}
 	};
 
-	class SyntaxError : public Error {
-		public:
-		SyntaxError(string msg): Error(msg, "SyntaxError") {};
+	class SyntaxError : public Aardvark::Error {
+	public:
+		SyntaxError(std::string_view msg): Aardvark::Error(msg, "SyntaxError") {}
 	};
 
-	class TypeError : public Error {
-		public:
-		TypeError(string msg): Error(msg, "TypeError") {};
+	class TypeError : public Aardvark::Error {
+	public:
+		TypeError(std::string_view msg): Aardvark::Error(msg, "TypeError") {}
 	};
 
-	class UndeclaredError : public Error {
+	class UndeclaredError : public Aardvark::Error {
     public:
-		UndeclaredError(string msg): Error(msg, "UndeclaredError") {};
+		UndeclaredError(std::string_view msg): Aardvark::Error(msg, "UndeclaredError") {}
   };
 
-	class FileError : public exception {
-		public:
-		string message;
-		string type;
+	class FileError : public Aardvark::Error {
+	public:
+		std::string message;
+		std::string type;
 
 		FileError(string type, string message): message(message), type(type) {
 			format();
-		};
+		}
+
 		FileError(string message): message(message) {
 			type = "FileError";
 			format();
-		};
+		}
 
 		void format() {
 			if (type == "Not Found") {
